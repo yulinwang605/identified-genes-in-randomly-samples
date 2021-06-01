@@ -16,9 +16,8 @@ import time
 
 import sys, getopt
 
-opts, args = getopt.getopt(sys.argv[1:],"hf:c:p:",["folder=","coverage=","permution="])
-input_file=""
-output_file=""
+opts, args = getopt.getopt(sys.argv[1:], "hf:c:p:", ["folder=", "coverage=", "permution="])
+
 def Usage():
     print ""
     print "Summarize identified genes in randomly select samples for the rarefaction curve"
@@ -29,9 +28,12 @@ def Usage():
     print "-h,  : Print help"
     print ""
     print ""
+
 def finish():
     print""
     print"Job finidhed!"
+
+
 for op, value in opts:
     if op == "-f":
         folder = value
@@ -41,85 +43,79 @@ for op, value in opts:
         print "Coverage cutoff is ", filtercov
     elif op == "-p":
         pm = value
-        print "Use ",pm," times permution"
+        print "Use ", pm, " times permutation"
     elif op == "-h":
         Usage()
         sys.exit()
 
-relation = open("corresponding.txt","r")
-#folder = raw_input("Enter the folder that contains all coverm results: ")
-output = open("samples-number-vs-identified-genes-"+str(pm)+"-permution.txt","w")
-#filtercov = raw_input("Enter the cufoff for average coverage: ")
+# relation = open("corresponding.txt","r")
+output = open("samples-number-vs-identified-genes-" + str(pm) + "-permution.txt", "w")
 
-output.write("Sample-names"+"\t"+"Number-of-samples"+"\t"+"Identified-genes"+"\n")
+output.write("Sample-names" + "\t" + "Number-of-samples" + "\t" + "Identified-genes" + "\n")
 
 start = time.time()
 
+# check sample number in the folder
+onlyfiles = next(os.walk(folder))[2]
+SampNum = len(onlyfiles)
 
-#prefilter the coverm results to rm the undetected files
+# prefilter the coverm results to rm the undetected files
+idName = {}
 if os.path.exists("./filtered-coverm-results"):
     print "Coverm results have been filtered."
 else:
     os.mkdir("./filtered-coverm-results")
-    for root,dirs,files in os.walk(folder):
+    fileID = 0
+    for root, dirs, files in os.walk(folder):
         for file in files:
-            tmp1 = open(os.path.join(root,file),"r")
-            output1 = open("./filtered-coverm-results/"+str(file),"w")
+            fileID += 1
+            idName[str(fileID)] = str(file)
+            tmp1 = open(os.path.join(root, file), "r")
+            header = tmp1.readline()
+            output1 = open("./filtered-coverm-results/" + str(file), "w")
+            output1.write(str(header).strip() + "\n")
             for line in tmp1:
-                if "Sample" in str(line):
-                    output1.write(str(line).strip()+"\n")
-                elif float(str(line).split("\t")[2]) >= float(filtercov):
-                    output1.write(str(line).strip()+"\n")
+                if float(str(line).split("\t")[2]) >= float(filtercov):
+                    output1.write(str(line).strip() + "\n")
                 else:
                     continue
             output1.close()
+print idName
 
-
-#store the sample umber and sample name
-idName ={}
-for line in relation:
-    cont = str(line).strip().split("\t")
-    idName[cont[0]] = str(cont[1])+".coverage.txt"
-
-#creat a huge library to store the filename vs all identified genes.
+# library of filename vs all identified genes.
 allgenes = {}
-for root,dirs,files in os.walk("./filtered-coverm-results"):
+for root, dirs, files in os.walk("./filtered-coverm-results"):
     for file in files:
-        tmp2 = open(os.path.join(root,file),"r")
+        tmp2 = open(os.path.join(root, file), "r")
+        header = tmp2.readline()
         tmplist = []
         for line in tmp2:
-            if "Sample" not in str(line):
-                tmplist.append(str(line).strip().split("\t")[1])
-            else:
-                continue
-        allgenes[str(file).strip()] = tmplist[0]+"\t"+"\t".join(tmplist[1:])
-print allgenes
+            tmplist.append(str(line).strip().split("\t")[1])
+        allgenes[str(file).strip()] = tmplist[0] + "\t" + "\t".join(tmplist[1:])
 
-#randomly select samples
-ids = list(range(1,99,1)) #sample number from 1 to 6,this is for the test dataset
-#the following script will be used to study the random select samples numbersfor item in ids:
+# randomly select samples
+ids = list(range(1, SampNum, 1))
 for item in ids:
-    for i in range(0,int(pm),1): #randomly select number of times.
-        select = random.sample(ids,int(item))
-        i+=1
-        print "randamly select ",item,"samples"
+    for i in range(0, int(pm), 1):  # permutation times
+        select = random.sample(ids, int(item))
+        i += 1
+        print "Randomly select ", item, "samples"
         filename = []
-        genename = [] #store identified gene name in different sample combination strategy
-        for sampleid in select:     #get number of id to tranfer into file name
+        genename = []
+        for sampleid in select:
             filename.append(idName[str(sampleid)])
         for name in filename:
-            genename = genename+str(allgenes[str(name)]).split("\t")
-        uniqgname = list(set(genename))#rm redundant gene names
+            genename = genename + str(allgenes[str(name)]).split("\t")
+        uniqgname = list(set(genename))
         if len(filename) == 1:
-            output.write(filename[0]+"\t"+str(item)+"\t"+str(len(uniqgname))+"\n")
+            output.write(filename[0] + "\t" + str(item) + "\t" + str(len(uniqgname)) + "\n")
         else:
-            output.write(filename[0]+" "+" ".join(filename[1:])+"\t"+str(item)+"\t"+str(len(uniqgname))+"\n")
+            output.write(filename[0] + " " + " ".join(filename[1:]) + "\t" + str(item) + "\t" + str(len(uniqgname)) + "\n")
 
 output.close()
 
-
 end = time.time()
-print "Used time: ",str(end-start)
+print "Used time: ", str(end - start)
 
 finish()
 sys.exit()
