@@ -16,10 +16,10 @@ If we map the raw reads to the gene catalog (Nucleic acid sequences) using Cover
   $ python summarize-identified-genes-in-randomly-selected-samples.py -h  
   
   
-    -f   : Folder contains all CoverM (https://github.com/wwood/CoverM) results (contig-mode) of all all sample.  
-    -c,  : coverage cutoff for the valid identified genes in each sample.  
-    -p   : times of permution.  
-    -h,  : Print help
+    -f : Folder contains all CoverM (https://github.com/wwood/CoverM) results (contig-mode) of all all sample.  
+    -c : coverage cutoff for the valid identified genes in each sample.  
+    -p : times of permution.  
+    -h : Print help
 ```
 ## Example
 
