@@ -23,9 +23,9 @@ def Usage():
     print "Summarize identified genes in randomly select samples for the rarefaction curve"
     print ""
     print "-f   : Folder contains all CoverM (https://github.com/wwood/CoverM) results (contig-mode) of all all sample.."
-    print "-c,  : coverage cutoff for the valid identified genes in each sample."
+    print "-c  : coverage cutoff for the valid identified genes in each sample."
     print "-p   : times of permution."
-    print "-h,  : Print help"
+    print "-h  : Print help"
     print ""
     print ""
 
