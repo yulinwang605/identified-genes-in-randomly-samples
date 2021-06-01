@@ -1,11 +1,11 @@
 # identified-genes-in-randomly-samples
 ## General description 
-We may obtained a non-redundant gene catalog from numbers of metagenomic datasets and want to draw a rarefraction curve of detected genes VS number of randomly selected metagenomic datasets.  
+We may obtain a non-redundant gene catalog from numbers of metagenomic datasets and want to draw a **rarefraction curve** of detected genes vs number of randomly selected metagenomic datasets.  
 
 If we map the raw reads to the gene catalog (Nucleic acid sequences) using CoverM (contig mode), we will get a number of files that contain Gene Id and coverage.
 
 ## Input parameters
-- `A folder contains all CoverM mapping results (**in the folder of example-data**).`  
+- `A folder contains all CoverM mapping results (**refer to the folder of example-data**).`  
 
 - `Gene coverage cutoff (e.g., 0.5, gene coverage >0.5 was thought to be identified in given metagenomic dataset.)`
 
